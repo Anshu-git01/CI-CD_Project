@@ -1,5 +1,3 @@
-name: CI/CD Pipeline
-
 on:
   push:
     branches: ["main"]
@@ -12,20 +10,26 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - name: Login to DockerHub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
     - name: Build Docker image
+      run: docker build -t devops-app .
+
+    - name: Tag image
+      run: docker tag devops-app 052714/devops-app:${{ github.sha }}
+
+    - name: Push image
+      run: docker push 052714/devops-app:${{ github.sha }}
+
+    - name: Update deployment.yaml image
       run: |
-        eval $(minikube docker-env)
-        docker build -t devops-app .
+        sed -i "s|image: .*|image: 052714/devops-app:${{ github.sha }}|g" deployment.yaml
 
-        ##- name: Login to DockerHub
-      ##run: echo "${{ secrets.DOCKER_PASSWORD}}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-        ##- name: Push image
-        ##run: |
-        ##docker tag devops-app 052714/devops-app
-        ##docker push 052714/devops-app
-
-    - name: Deploy to Kubernetes
+    - name: Commit and push changes
       run: |
-        kubectl apply -f deployment.yaml
-        kubectl apply -f service.yaml
+        git config --global user.name "github-actions"
+        git config --global user.email "actions@github.com"
+        git add deployment.yaml
+        git commit -m "Update image tag to ${{ github.sha }}"
+        git push

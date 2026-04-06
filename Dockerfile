@@ -1,9 +1,14 @@
 FROM node:18-alpine
 
 WORKDIR /app
-COPY . .
+
+# Copy only package files first (for caching)
+COPY package*.json ./
 RUN npm install
 
-EXPOSE 3000
-CMD ["node","app.js"]
+# Then copy rest of code
+COPY . .
 
+EXPOSE 3000
+
+CMD ["node", "app.js"]

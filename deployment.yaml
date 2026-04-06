@@ -16,7 +16,14 @@ spec:
     spec:
       containers:
         - name: devops-app
-          image: devops-app
-          imagePullPolicy: Never
+          image: 052714/devops-app:latest
           ports:
             - containerPort: 3000
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

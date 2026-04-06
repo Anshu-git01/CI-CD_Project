@@ -2,6 +2,9 @@ on:
   push:
     branches: ["main"]
 
+permissions:
+  contents: write   # ✅ REQUIRED
+
 jobs:
   build:
     runs-on: self-hosted
@@ -31,5 +34,5 @@ jobs:
         git config --global user.name "github-actions"
         git config --global user.email "actions@github.com"
         git add deployment.yaml
-        git commit -m "Update image tag to ${{ github.sha }}"
-        git push
+        git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main

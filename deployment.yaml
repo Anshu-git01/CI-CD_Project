@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: devops-app
-          image: 052714/devops-app:latest
+          image: 052714/devops-app:880943dce4a69e8951c254a8d26f8e3c5bf17022
           ports:
             - containerPort: 3000
 
